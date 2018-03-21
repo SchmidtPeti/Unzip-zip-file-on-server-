@@ -1,12 +1,13 @@
 <?php
+$zip_name ="";
 if(isset($_GET["submit"])){
-	$zip_name = basename($_FILES["zip_file_name"]["name"]);
+	$zip_name = $_GET["zip_file_name"];
 }
 //without (wordpress)basename do nothing
 if(!isset($zip_name)){
 //unpack to a dir called sth for example(wordpress,drupal)
 $zip = new ZipArchive;
-if ($zip->open($_SERVER['DOCUMENT_ROOT'].'/wordpress-4.9-hu_HU.zip') === TRUE) {
+if ($zip->open($_SERVER['DOCUMENT_ROOT'].'/'.$zip_name) === TRUE) {
  
     $zip->extractTo($_SERVER['DOCUMENT_ROOT'].'/');
  
@@ -34,9 +35,9 @@ foreach ($files as $file) {
 	}
 }
 ?>
- <!--ask the version of wordpress-->
-<form method="get" enctype="multipart/form-data">
-	<label for="verzio">zip place(to decide the version)</label>
-	<input type="file" name="zip_file_name">
-    <input type="submit" value="Send zip file name" name="submit">
+ <!--ask for file name-->
+ <h2>Place put this file into that folder where your file is waiting for be extracted work for wordpress website</h2>
+<form method="get">
+	<input type="name" name="zip_file_name" placeholder="file name:">
+    <input type="submit" value="Send zip file name" name="Extract">
 </form> 
