@@ -1,51 +1,31 @@
+<head>
+  <title>Unzipper->unzip your files</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<div class="container">
+<h2>Wordpress, Drupal and oxwall unzipper</h2>
 <?php
-$zip_name ="";
-if(isset($_GET["Extract"])){
-	$zip_name ="";
-	$zip_name = $_GET["zip_file_name"];
-}
-//without (wordpress)basename do nothing
-if(isset($zip_name)&&$zip_name !=""){
-//unpack to a dir called sth for example(wordpress,drupal)
-$zip = new ZipArchive;
-echo $_SERVER['DOCUMENT_ROOT'].'/'.$zip_name;
-if ($zip->open($_SERVER['DOCUMENT_ROOT'].'/'.$zip_name) === TRUE) {
- 
-    $zip->extractTo($_SERVER['DOCUMENT_ROOT'].'/');
- 
-    $zip->close();
- 
-    echo 'ok';
- 
-} else {
- 
-    echo 'failed';
- 
-}
-$file_name = explode(".",$zip_name)[0];
-//move file from default dir to root dir
-if(is_dir($_SERVER['DOCUMENT_ROOT'].'/'.$file_name)){
-$files = scandir($_SERVER['DOCUMENT_ROOT'].'/'.$file_name);
-$source = $_SERVER['DOCUMENT_ROOT'].'/'.$file_name;
-$destination = $_SERVER['DOCUMENT_ROOT']."/";
-foreach ($files as $file) {
-  if (in_array($file, array(".",".."))) continue;
-  if(is_dir($source.$file)){
-      recurse_copy($source.$file,$destination.$file);
-  }
-  else{
-  if(copy($source.$file, $destination.$file)) {
-    $delete[] = $source.$file;
-  }
-	}
-	foreach ($delete as $file) {
- 		 unlink($file);
-	}
-  }
-}
-}
-function recurse_copy($src,$dst) { 
+highlight_string('A root mappának teljesen üresnek kell lenni a zipelés során');
+ $files = glob('*.zip');
+ print_r($files);
+ $dirname = '';
+ $zip = new ZipArchive();
+ $res = $zip->open($files[0]);
+ if($res==true){
+	 $zip->extractTo($_SERVER['DOCUMENT_ROOT']);
+	 $zip->close();
+	 echo "királyság";
+ }
+  $dir = glob($dirname.'*',GLOB_ONLYDIR);
+  print_r($dir);
+ function recurse_copy($src,$dst) { 
     $dir = opendir($src); 
+    @mkdir($dst); 
     while(false !== ( $file = readdir($dir)) ) { 
         if (( $file != '.' ) && ( $file != '..' )) { 
             if ( is_dir($src . '/' . $file) ) { 
@@ -59,9 +39,4 @@ function recurse_copy($src,$dst) {
     closedir($dir); 
 } 
 ?>
- <!--ask for file name-->
- <h2>Place put this file into that folder where your file is waiting for be extracted work for wordpress website</h2>
-<form method="get">
-	<input type="name" name="zip_file_name" placeholder="file name:">
-    <input type="submit" value="Send zip file name" name="Extract">
-</form> 
+</div>
