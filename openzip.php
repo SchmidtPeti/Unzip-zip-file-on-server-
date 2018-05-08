@@ -9,6 +9,7 @@
 </head>
 <div class="container">
 <h2>Zipper for extracting your files free</h2>
+<h3>Move this file to the root folder and move your zip file to root folder</h3>
 <form method="post">
   <div class="form-group">
     <label for="zip_folder">Zip folder:</label>
