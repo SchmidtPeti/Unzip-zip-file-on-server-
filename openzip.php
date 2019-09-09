@@ -1,5 +1,6 @@
+<html>
 <head>
-  <title>Unzipper->unzip your files</title>
+  <title>Zip your files</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
@@ -7,18 +8,76 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 </head>
+<body>
 <div class="container">
-<h2>Zipper for extracting your files free</h2>
-<h3>Move this file to the root folder and move your zip file to root folder</h3>
+    <?php
+    if(isset($_POST["extract"])){
+        //$dirname = '';
+        $zip = new ZipArchive();
+        $res = $zip->open($_POST["zip_name"]);
+        if($res==true){
+            $zip->extractTo($_SERVER['DOCUMENT_ROOT']);
+            $zip->close();
+            echo '<div class="alert alert-success">
+  <strong>Success!</strong> Zip is extracted.
+</div>';
+        }
+        //$dir = glob($dirname.'*',GLOB_ONLYDIR);
+        //print_r($dir);
+        $dst = $_SERVER['DOCUMENT_ROOT'];
+        if($_POST["folder_name"]!=""){
+            echo'<div class="alert alert-info">
+  <strong>info!</strong> Waitinf for copying....
+</div>';
+            try {
+                recurse_copy($_POST["folder_name"], $dst);
+            }
+            catch (Exception $exception){
+
+            }
+            echo '<div class="alert alert-success">
+  <strong>Success!</strong> Copy all file from folder is done!.
+</div>';
+        }
+        else{
+            echo '<div class="alert alert-success">
+  <strong>Success!</strong> Copy all file from folder is done!.
+</div>';
+        }
+        function recurse_copy($src,$dst) {
+            $dir = opendir($src);
+            @mkdir($dst);
+            while(false !== ( $file = readdir($dir)) ) {
+                if (( $file != '.' ) && ( $file != '..' )) {
+                    if ( is_dir($src . '/' . $file) ) {
+                        recurse_copy($src . '/' . $file,$dst . '/' . $file);
+                    }
+                    else {
+                        copy($src . '/' . $file,$dst . '/' . $file);
+                    }
+                }
+            }
+            closedir($dir);
+        }
+    }
+    ?>
+<h2>Extract your zip file from serve</h2>
+<p>Place the "openzip.php" file to the root folder and move your zip file </p>
 <form method="post">
   <div class="form-group">
-    <label for="zip_folder">Zip folder:</label>
+    <label for="zip_folder">Found zip file in this folder:</label>
+
     <select multiple class="form-control" name="zip_name" id="zip_folder">
 	<?php
 	 $files = glob('*.zip');
-	 for($i=0;$i<count($files);$i++){
-		 echo '<option>'.$files[$i].'</option>';
-	 }
+	 if(count($files)<1){
+         echo '<option value="" disabled>Place your zip file in the folder where this file is</option>';
+     }
+	 else {
+         for ($i = 0; $i < count($files); $i++) {
+             echo '<option value="'. $files[$i].'">' . $files[$i] . '</option>';
+         }
+     }
 	?>
     </select>
   </div>
@@ -29,51 +88,7 @@
   <div class="form-group">
   <input type="submit" name="extract" class="btn btn-success" value="Extract">
   </div>
-<?php
-if(isset($_POST["extract"])){
- //$dirname = '';
- $zip = new ZipArchive();
- $res = $zip->open($_POST["zip_name"]);
- if($res==true){
-	 $zip->extractTo($_SERVER['DOCUMENT_ROOT']);
-	 $zip->close();
-	 echo '<div class="alert alert-success">
-  <strong>Success!</strong> Zip is extracted.
-</div>';
- }
- //$dir = glob($dirname.'*',GLOB_ONLYDIR);
- //print_r($dir);
- $dst = $_SERVER['DOCUMENT_ROOT'];
- if($_POST["folder_name"]!=""){
-	echo'<div class="alert alert-info">
-  <strong>info!</strong> Waitinf for copying....
-</div>';
- recurse_copy($_POST["folder_name"],$dst);
- echo '<div class="alert alert-success">
-  <strong>Success!</strong> Copy all file from folder is done!.
-</div>';
- }
- else{
-	echo '<div class="alert alert-success">
-  <strong>Success!</strong> Copy all file from folder is done!.
-</div>'; 
- }
- function recurse_copy($src,$dst) { 
-    $dir = opendir($src); 
-    @mkdir($dst); 
-    while(false !== ( $file = readdir($dir)) ) { 
-        if (( $file != '.' ) && ( $file != '..' )) { 
-            if ( is_dir($src . '/' . $file) ) { 
-                recurse_copy($src . '/' . $file,$dst . '/' . $file); 
-            } 
-            else { 
-                copy($src . '/' . $file,$dst . '/' . $file); 
-            } 
-        } 
-    } 
-    closedir($dir); 
-} 
-}
-?>
 </form>
 </div>
+</body>
+</html>
