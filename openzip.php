@@ -15,34 +15,32 @@
         //$dirname = '';
         $zip = new ZipArchive();
         $res = $zip->open($_POST["zip_name"]);
+        $dst = $_SERVER['DOCUMENT_ROOT'];
+
+
         if($res==true){
-            $zip->extractTo($_SERVER['DOCUMENT_ROOT']);
+            $zip->extractTo($dst);
             $zip->close();
             echo '<div class="alert alert-success">
-  <strong>Success!</strong> Zip is extracted.
-</div>';
+            <strong>Success!</strong> Zip is extracted.
+            </div>';
         }
-        //$dir = glob($dirname.'*',GLOB_ONLYDIR);
-        //print_r($dir);
-        $dst = $_SERVER['DOCUMENT_ROOT'];
+
+
+
         if($_POST["folder_name"]!=""){
             echo'<div class="alert alert-info">
-  <strong>info!</strong> Waitinf for copying....
-</div>';
+                <strong>info!</strong> Waiting for copying....
+            </div>';
             try {
                 recurse_copy($_POST["folder_name"], $dst);
             }
             catch (Exception $exception){
-
+                echo '<div class="alert alert-danger"><strong>Error</strong>You gave me folder which do not exist in the zip folder</div>';
             }
             echo '<div class="alert alert-success">
-  <strong>Success!</strong> Copy all file from folder is done!.
-</div>';
-        }
-        else{
-            echo '<div class="alert alert-success">
-  <strong>Success!</strong> Copy all file from folder is done!.
-</div>';
+                    <strong>Success!</strong> Move out all of the file from folder!.
+            </div>';
         }
         function recurse_copy($src,$dst) {
             $dir = opendir($src);
@@ -83,7 +81,7 @@
   </div>
   <div class="form-group">
     <label for="folder_name">Folder in the zip file:</label>
-	<input id="folder_name" type="text" class="form-control" name="folder_name" placeholder="Folder in the zip or leave empty" value="">
+	<input id="folder_name" type="text" class="form-control" name="folder_name" placeholder="You use this when there is a folder in your zip.file(input the name of this folder) or leave it empty" value="">
   </div>
   <div class="form-group">
   <input type="submit" name="extract" class="btn btn-success" value="Extract">
