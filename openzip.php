@@ -11,52 +11,52 @@
 <body>
 <div class="container">
     <?php
-    if(isset($_POST["extract"])){
+    function rcopy($src, $dst)
+    {
+        $files = scandir($src);
+        print_r($files);
+        echo 'Fuck you!';
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                rcopy("$src/$file", "$dst/$file");
+            } else if (file_exists($src)) {
+                copy($src, $dst);
+            }
+        }
+    }
+    if(isset($_POST["extract"])) {
         //$dirname = '';
         $zip = new ZipArchive();
         $res = $zip->open($_POST["zip_name"]);
-        $dst = './';
+        $dst = $_SERVER['DOCUMENT_ROOT'];
         $was_Extracion = false;
 
-        if($res==true){
+        if ($res == true) {
             $zip->extractTo($dst);
             $zip->close();
             echo '<div class="alert alert-success">
             <strong>Success!</strong> Zip is extracted.
             </div>';
             $was_Extracion = true;
-        }
-        else{
+        } else {
             echo '<h2>Zip extraction is failed!</h2>';
         }
 
 
-        if($_POST["folder_name"]!=""&&$was_Extracion){
-            echo'<div class="alert alert-info">
+        if ($_POST["folder_name"] != "" && $was_Extracion) {
+            echo '<div class="alert alert-info">
                 <strong>info!</strong> Waiting for copying all the files here from that specified folder...
             </div>';
             try {
                 rcopy($_POST["folder_name"], $dst);
-            }
-            catch (Exception $exception){
+            } catch (Exception $exception) {
                 echo '<div class="alert alert-danger"><strong>Error</strong>You gave me folder which was not in the zip folder</div>';
             }
             echo '<div class="alert alert-success">
                     <strong>Success!</strong> Move out all of the files here from the folder!.
             </div>';
         }
-        function rcopy($src, $dst) {
-            if (file_exists ( $dst ))
-                rrmdir ( $dst );
-            if (is_dir ( $src )) {
-                mkdir ( $dst );
-                $files = scandir ( $src );
-                foreach ( $files as $file )
-                    if ($file != "." && $file != "..")
-                        rcopy ( "$src/$file", "$dst/$file" );
-            } else if (file_exists ( $src ))
-                copy ( $src, $dst );
-        }    }
+    }
     ?>
 <h2>Extract your zip file from server</h2>
 <p>Place the "openzip.php" file to the root folder and move your zip file there</p>
@@ -64,8 +64,7 @@
 <form method="post">
   <div class="form-group">
     <label for="zip_folder">Found zip files in this folder:</label>
-
-    <select multiple class="form-control" name="zip_name" id="zip_folder">
+    <select multiple class="form-control" name="zip_name" id="zip_folder" required>
 	<?php
 	 $files = glob('*.zip');
 	 if(!$files!==null) {
