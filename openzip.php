@@ -11,18 +11,20 @@
 <body>
 <div class="container">
     <?php
-    function rcopy($src, $dst)
-    {
-        $files = scandir($src);
-        print_r($files);
-        echo 'Fuck you!';
-        foreach ($files as $file) {
-            if ($file != "." && $file != "..") {
-                rcopy("$src/$file", "$dst/$file");
-            } else if (file_exists($src)) {
-                copy($src, $dst);
+    function recurse_copy($src,$dst) {
+        $dir = opendir($src);
+        @mkdir($dst);
+        while(false !== ( $file = readdir($dir)) ) {
+            if (( $file != '.' ) && ( $file != '..' )) {
+                if ( is_dir($src . '/' . $file) ) {
+                    recurse_copy($src . '/' . $file,$dst . '/' . $file);
+                }
+                else {
+                    copy($src . '/' . $file,$dst . '/' . $file);
+                }
             }
         }
+        closedir($dir);
     }
     if(isset($_POST["extract"])) {
         //$dirname = '';
@@ -48,7 +50,7 @@
                 <strong>info!</strong> Waiting for copying all the files here from that specified folder...
             </div>';
             try {
-                rcopy($_POST["folder_name"], $dst);
+                recurse_copy($_POST["folder_name"], $dst);
             } catch (Exception $exception) {
                 echo '<div class="alert alert-danger"><strong>Error</strong>You gave me folder which was not in the zip folder</div>';
             }
